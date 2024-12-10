@@ -16,7 +16,7 @@ async function compressPicture(from: string, to: string) {
     switch (ext) {
         case ".png":
             await sharp(from)
-                .toColourspace("rgba8888")
+                .toColourspace("srgb")
                 .png({ quality: CFG.QUALITY.PNG, compressionLevel: 1, dither: 0, palette: true })
                 .toFile(to);
             break;
@@ -87,4 +87,26 @@ async function compressPictureByDir(dir: string, to: string, force: boolean = fa
     Cache.save();
 }
 
-export default { compressPicture, compressPictureByDir };
+/**
+ * 强制压缩
+ */
+async function compressPictureForce() {
+    for (let i = 0; i < CFG.FORCES.length; i++) {
+        const item = CFG.FORCES[i];
+        const from = path.resolve(path.join(CFG.FROM, item));
+        const to = path.join(CFG.TO, item);
+        if (CFG.IMAGE_EXT.includes(path.extname(item).toLowerCase())) {
+            const hash = md5(fs.readFileSync(from, { encoding: "utf-8" }));
+            if (Cache.compare(from, hash)) {
+                console.log("！！！跳过未更改文件", from, hash);
+                continue;
+            } else {
+                await compressPicture(from, to);
+                Cache.write(from, hash);
+            }
+        }
+    }
+    Cache.save();
+}
+
+export default { compressPicture, compressPictureByDir, compressPictureForce };

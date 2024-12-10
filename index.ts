@@ -17,14 +17,5 @@ import COM from "./compress";
     // 常规压缩
     await COM.compressPictureByDir(CFG.FROM, CFG.TO);
     // 强制压缩
-    CFG.FORCES.forEach(async (v) => {
-        const where = path.join(CFG.FROM, v);
-        const to = path.join(CFG.TO, v);
-        const stat = fs.statSync(where);
-        if (stat.isDirectory()) {
-            await COM.compressPictureByDir(where, to, true);
-        } else if (CFG.IMAGE_EXT.includes(path.extname(v).toLowerCase())) {
-            await COM.compressPicture(where, to);
-        }
-    });
+    await COM.compressPictureForce();
 })();
