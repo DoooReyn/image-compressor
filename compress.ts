@@ -16,7 +16,7 @@ async function compressPicture(from: string, to: string) {
     switch (ext) {
         case ".png":
             await sharp(from)
-                .toColourspace("srgb")
+                .toColourspace(CFG.QUALITY.PNG_COLORSPACE)
                 .png({ quality: CFG.QUALITY.PNG, compressionLevel: 1, dither: 0, palette: true })
                 .toFile(to);
             break;
